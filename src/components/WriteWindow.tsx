@@ -2,14 +2,9 @@ import { useEffect, useState } from "react";
 import { EventBus } from "@/game/EventBus";
 import { cn } from "@/lib/utils";
 import { useContent } from "@/hooks/useContent";
-import { executePublishAndEarnTransaction } from "@/game/utils/executePublishAndEarnTransaction";
-import { useWallet } from '@aptos-labs/wallet-adapter-react'; 
-import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk';
+import { useCurrentAccount } from '@mysten/dapp-kit'
 
 interface WriteWindowProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const config = new AptosConfig({ network: Network.MAINNET });
-const aptos = new Aptos(config);
 
 export function WriteWindow({ className }: WriteWindowProps) {
     const CONTRACT_ADDRESS = "0x98a71c7bb7fe70e92185d12477a1f9553cf4f2312faa469ef98a35810c614c4a";
@@ -19,7 +14,7 @@ export function WriteWindow({ className }: WriteWindowProps) {
     const [writeContent, setWriteContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const { createStory, loading } = useContent();
-    const { account, signAndSubmitTransaction } = useWallet();
+    const account = useCurrentAccount();
 
     useEffect(() => {
         const handleOpenWrite = () => {
@@ -55,20 +50,21 @@ export function WriteWindow({ className }: WriteWindowProps) {
         }
         setIsLoading(true);
         try {
-            const response = await signAndSubmitTransaction({
-                sender: account.address,
-                data: {
-                    function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::${FUNCTION_NAME}`,
-                    functionArguments: [],
-                },
-            });
+          // send
+            // const response = await signAndSubmitTransaction({
+            //     sender: account.address,
+            //     data: {
+            //         function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::${FUNCTION_NAME}`,
+            //         functionArguments: [],
+            //     },
+            // });
             
-            try {
-                await aptos.waitForTransaction({ transactionHash: response.hash });
-                alert("Transaction successful! Your content will be prioritized in recommendations.");
-            } catch (error) {
-                console.error(error);
-            }
+            // try {
+            //     await aptos.waitForTransaction({ transactionHash: response.hash });
+            //     alert("Transaction successful! Your content will be prioritized in recommendations.");
+            // } catch (error) {
+            //     console.error(error);
+            // }
             
             const autoTitle = writeContent.trim().slice(0, 15) + "...";
             const result = await createStory(autoTitle, writeContent, true);
@@ -159,7 +155,7 @@ export function WriteWindow({ className }: WriteWindowProps) {
                         marginBottom: '24px',
                         alignSelf: 'flex-start'
                     }}>
-                       👋Hi there, Aptos frens!
+                       👋Hi there, SUI frens!
                     </h2>
 
                     <div style={{
@@ -170,7 +166,7 @@ export function WriteWindow({ className }: WriteWindowProps) {
                         marginBottom: '24px',
                         alignSelf: 'flex-start'
                     }}>
-                        Looking for Aptos builders, creators, or projects? Post your needs and start meaningful collaborations.
+                        Looking for SUI builders, creators, or projects? Post your needs and start meaningful collaborations.
                     </div>
 
                     {/* Story Input */}

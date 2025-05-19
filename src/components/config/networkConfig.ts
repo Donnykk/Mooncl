@@ -1,6 +1,6 @@
 import { getFullnodeUrl } from "@mysten/sui/client";
 import { createNetworkConfig } from "@mysten/dapp-kit";
-import { MAINNET_COUNTER_PACKAGE_ID, PACKAGE_ID, TESTNET_COUNTER_PACKAGE_ID } from "./suiConstant";
+import { PACKAGE_ID, POOL_ID, POOL_CAP_ID } from "./suiConstant";
 
 const { networkConfig, useNetworkVariable, useNetworkVariables } =
     createNetworkConfig({
@@ -8,18 +8,22 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
             url: getFullnodeUrl("devnet"),
             variables: {
                 counterPackageId: PACKAGE_ID,
+                poolId: POOL_ID,
+                poolCapId: POOL_CAP_ID,
             },
         },
         testnet: {
             url: getFullnodeUrl("testnet"),
             variables: {
-                counterPackageId: TESTNET_COUNTER_PACKAGE_ID,
+                counterPackageId: PACKAGE_ID,
+                poolId: POOL_ID,
+                poolCapId: POOL_CAP_ID,
             },
         },
         mainnet: {
             url: getFullnodeUrl("mainnet"),
             variables: {
-                counterPackageId: MAINNET_COUNTER_PACKAGE_ID,
+                counterPackageId: "",
             },
         },
     });

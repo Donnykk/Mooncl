@@ -169,26 +169,26 @@ export class loginScene extends Scene {
         // 使用方式
         const title = createGradientText(this, width / 2, height * 0.25, "Welcome to Mooncl", "80px");
 
-        // 添加副标题
-        // const subtitle = this.add.text(width / 2, 420, "Aptos Board", {
-        //     fontSize: "20px",
-        //     color: "#999999",
-        //     fontFamily: "Space Grotesk",
-        //     fontStyle: "400",
-        //     lineSpacing: 10,
-        //     align: 'center'
-        // }).setOrigin(0.5);
+        //添加副标题
+        const subtitle = this.add.text(width / 2, 420, "SUI Board", {
+            fontSize: "20px",
+            color: "#999999",
+            fontFamily: "Space Grotesk",
+            fontStyle: "400",
+            lineSpacing: 10,
+            align: 'center'
+        }).setOrigin(0.5);
 
-        // 添加描述文字
-        // const description = this.add.text(width / 2, 466, "Connecting Aptos Ecosystem Partners Effortlessly", {
-        //     fontSize: "20px",
-        //     color: "#999999",
-        //     fontFamily: "Space Grotesk",
-        //     fontStyle: "400",
-        //     lineSpacing: 10,
-        //     wordWrap: { width: 498 },
-        //     align: 'center'
-        // }).setOrigin(0.5);
+        //添加描述文字
+        const description = this.add.text(width / 2, 466, "Connecting SUI Ecosystem Partners Effortlessly", {
+            fontSize: "20px",
+            color: "#999999",
+            fontFamily: "Space Grotesk",
+            fontStyle: "400",
+            lineSpacing: 10,
+            wordWrap: { width: 498 },
+            align: 'center'
+        }).setOrigin(0.5);
 
         // 移除原来的DOM元素容器（不需要了）
         // this.connectButtonContainer.destroy(); // 如果之前创建过的话
