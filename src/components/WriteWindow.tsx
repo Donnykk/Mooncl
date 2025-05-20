@@ -3,6 +3,7 @@ import { EventBus } from "@/game/EventBus";
 import { cn } from "@/lib/utils";
 import { useContent } from "@/hooks/useContent";
 import { useCurrentAccount } from '@mysten/dapp-kit'
+import { usePublish } from "@/hooks/sui/usePublish";
 
 interface WriteWindowProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -14,6 +15,7 @@ export function WriteWindow({ className }: WriteWindowProps) {
     const [writeContent, setWriteContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const { createStory, loading } = useContent();
+    const { publish } = usePublish();
     const account = useCurrentAccount();
 
     useEffect(() => {
@@ -50,22 +52,7 @@ export function WriteWindow({ className }: WriteWindowProps) {
         }
         setIsLoading(true);
         try {
-          // send
-            // const response = await signAndSubmitTransaction({
-            //     sender: account.address,
-            //     data: {
-            //         function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::${FUNCTION_NAME}`,
-            //         functionArguments: [],
-            //     },
-            // });
-            
-            // try {
-            //     await aptos.waitForTransaction({ transactionHash: response.hash });
-            //     alert("Transaction successful! Your content will be prioritized in recommendations.");
-            // } catch (error) {
-            //     console.error(error);
-            // }
-            
+            publish()
             const autoTitle = writeContent.trim().slice(0, 15) + "...";
             const result = await createStory(autoTitle, writeContent, true);
             if (result.success) {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { EventBus } from "../EventBus";
 import { WalletModal } from "@/components/WalletModal";
 import { useCurrentWallet, useSignPersonalMessage } from "@mysten/dapp-kit";
-import { getSuiBalance } from "./sui";
+import { fetchBalance } from "./sui";
 import { usePost } from "@/hooks/usePost";
 
 export function ReactPhaserBridge() {
@@ -43,7 +43,8 @@ export function ReactPhaserBridge() {
     try {
       const storedToken = localStorage.getItem("token");
       if (storedToken) {
-        const suiBalance = await getSuiBalance(address);
+        const suiBalance = await fetchBalance(address);
+        console.log(suiBalance);
         EventBus.emit("phaser_loginResponse", {
           success: true,
           data: {

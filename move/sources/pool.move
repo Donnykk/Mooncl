@@ -48,7 +48,7 @@ public fun new_epoch(pool: &mut Pool, _:&PoolCap, amount: u64, clock: &Clock, de
 
 public fun into_pool(pool: &mut Pool, ticket: Coin<SUI>, clock: &Clock){
   assert!(coin::value(&ticket) == pool.cur_currency_amount, 0);
-  assert!(clock.timestamp_ms() < pool.deadline, 1);
+  assert!(clock.timestamp_ms() <= pool.deadline, 1);
   coin::put(&mut pool.balance, ticket);
 }
 
