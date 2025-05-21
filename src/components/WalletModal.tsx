@@ -54,14 +54,14 @@ export function WalletModal({ onClose, onGameStart }: WalletModalProps) {
                             let btnText = "";
                             if (wallet.name === "Slush") {
                                 btnClass = isConnected
-                                    ? "bg-gradient-to-r from-[#FBBC05] via-[#EA4335] to-[#4285F4] text-white shadow-[0_0_8px_#4285F4]"
-                                    : "bg-gradient-to-r from-[#FBBC05] via-[#EA4335] to-[#4285F4] text-white shadow-[0_0_8px_#4285F4] hover:from-[#4285F4] hover:via-[#34A853] hover:to-[#FBBC05]";
+                                    ? "bg-[#00B2FF] text-white shadow-[0_0_8px_#00B2FF]"
+                                    : "bg-[#00B2FF] text-white shadow-[0_0_8px_#00B2FF] hover:bg-[#008FCC]";
                                 icon = (
-                                    <img src="/img/google_logo.svg" alt="Google" style={{ width: 20, height: 20, marginRight: 8, display: "inline-block", verticalAlign: "middle" }} />
+                                    <img src="/img/slush_logo.png" alt="Slush" style={{ width: 20, height: 20, marginRight: 8, display: "inline-block", verticalAlign: "middle" }} />
                                 );
                                 btnText = isConnected
-                                    ? `✅ Google (${currentWallet?.accounts?.[0]?.address.slice(0, 6)}...)`
-                                    : "Connect with Google";
+                                    ? `✅ Slush (${currentWallet?.accounts?.[0]?.address.slice(0, 6)}...)`
+                                    : "Connect Slush Wallet";
                             } else if (wallet.name === "OKX Wallet") {
                                 btnClass = "border-2 border-[#000] bg-white text-[#000] shadow-[0_0_8px_#000] hover:bg-[#f2f2f2]";
                                 icon = (
