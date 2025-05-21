@@ -7,7 +7,7 @@ const nextConfig = {
         return [
             {
                 source: '/api/:path*',
-                destination: 'http://43.134.74.254:8080/api/:path*'
+                destination: 'https://reach-herb-fossil-referred.trycloudflare.com/api/:path*'
             },
             {
                 source: '/mail/:path*',
