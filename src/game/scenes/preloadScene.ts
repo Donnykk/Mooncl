@@ -15,6 +15,22 @@ export class preloadScene extends Scene {
         const width = this.scale.gameSize.width;
         const height = this.scale.gameSize.height;
 
+        // 添加背景图片
+        const bgTexture = this.textures.get("cover");
+        const scaleX = width / bgTexture.source[0].width;
+        const scaleY = height / bgTexture.source[0].height;
+        const scale = Math.max(scaleX, scaleY);
+
+        const background = this.add
+            .image(width / 2, height / 2, "cover")
+            .setScale(scale)
+            .setTint(0x666666);
+
+        // 添加紫色背景叠加
+        const purpleOverlay = this.add
+            .image(width / 2, height / 2, "purple")
+            .setAlpha(0.7);
+
         // 创建半透明背景层
         const bg = this.add
             .rectangle(width / 2, height / 2, width, height, 0x000000, 0.7)
@@ -88,7 +104,6 @@ export class preloadScene extends Scene {
 
         // 将所有元素添加到容器
         container.add([
-            bg,
             spinner,
             this.loadingText,
             progressBg,
@@ -132,7 +147,8 @@ export class preloadScene extends Scene {
     preload() {
         // 加载loading动画资源
         // 资源加载
-        // this.load.image('tavern_bg', 'img/newbar.png');
+        this.load.image("cover", "img/cover_new.png");
+        this.load.image("purple", "img/page/purple.png");
         this.load.image("tavern_bg", "img/backgroundHorizontal.jpg");
         this.load.spritesheet("player", "animation/move.png", {
             frameWidth: 280,
@@ -147,22 +163,22 @@ export class preloadScene extends Scene {
         this.load.image("bar_menu", "img/bar_menu.png");
         this.load.image("bar_bottle", "img/bar_bottle.png");
         this.load.image("wine_logo", "img/wineIcon.png");
-        this.load.image('button_content', 'img/button_content.png');
-        this.load.image('button_write', 'img/button_write.png');
-        this.load.image('button_chat', 'img/button_chat.png');
-        this.load.image('dialog-box', 'img/Rectangle.png');
-        this.load.image('profile-pic', 'img/profile.png');
-        this.load.image('close-button', 'img/closeButton.png');
-        this.load.image('menu-rectangle', 'img/menuRectangle.png');
-        this.load.image('ellipse', 'img/Ellipse.png');
-        this.load.image('chat-hover', 'img/chatHover.png');
-        this.load.image('content-hover', 'img/contentHover.png'); 
-        this.load.image('write-hover', 'img/writeHover.png');
-        this.load.image('profile', 'img/page/user.png');
-        this.load.image('page', 'img/page/wine.png');
-        this.load.image('meet-button', 'img/meet.png');
-        this.load.image('profile-rectangle', 'img/profileRectangle.png');
-        this.load.image('point-rectangle', 'img/pointRectangle.png');
+        this.load.image("button_content", "img/button_content.png");
+        this.load.image("button_write", "img/button_write.png");
+        this.load.image("button_chat", "img/button_chat.png");
+        this.load.image("dialog-box", "img/Rectangle.png");
+        this.load.image("profile-pic", "img/profile.png");
+        this.load.image("close-button", "img/closeButton.png");
+        this.load.image("menu-rectangle", "img/menuRectangle.png");
+        this.load.image("ellipse", "img/Ellipse.png");
+        this.load.image("chat-hover", "img/chatHover.png");
+        this.load.image("content-hover", "img/contentHover.png");
+        this.load.image("write-hover", "img/writeHover.png");
+        this.load.image("profile", "img/page/user.png");
+        this.load.image("page", "img/page/wine.png");
+        this.load.image("meet-button", "img/meet.png");
+        this.load.image("profile-rectangle", "img/profileRectangle.png");
+        this.load.image("point-rectangle", "img/pointRectangle.png");
         this.registry.set("gridSize", 50);
         // debugger;
         const { width, height } = calculateGameSize(

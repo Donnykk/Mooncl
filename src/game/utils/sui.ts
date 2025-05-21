@@ -10,7 +10,7 @@ const gqlClient = new SuiGraphQLClient({
 
 const getPool = async()=>{
   const result = await gqlClient.query({ query: queryPool });
-  return result.data?.object?.asMoveObject?.contents?.json;
+  return result.data?.object?.asMoveObject?.contents?.json as Record<string, any>;
 }
 
 export const gettable = async (id: string) => {
@@ -20,7 +20,7 @@ export const gettable = async (id: string) => {
       id: id
     }
   });
-  return result.data?.owner?.dynamicFields?.nodes
+  return result.data?.owner?.dynamicFields?.nodes as Record<string, any>[];
   // return JSON.stringify(result.data?.owner?.dynamicFields?.nodes, null, 2)
 }
 

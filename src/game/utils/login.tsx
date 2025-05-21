@@ -76,7 +76,7 @@ export function ReactPhaserBridge() {
       });
 
       if (verifyResp?.success && verifyResp.token) {
-        const suiBalance = await getSuiBalance(address);
+        const suiBalance = await fetchBalance(address);
         EventBus.emit("phaser_loginResponse", {
           success: true,
           data: {

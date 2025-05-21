@@ -39,8 +39,6 @@ export class SceneManager {
         });
     }
 
-    
-
     private setupUIEventListeners() {
         // UI Close events - enable keyboard
         EventBus.on("close-write", () => {
@@ -88,7 +86,7 @@ export class SceneManager {
 
         // 积分背景图片 (左侧)
         const pointsBg = this.scene.add
-            .image(this.scene.cameras.main.width - 260, 48, 'point-rectangle')
+            .image(this.scene.cameras.main.width - 260, 48, "point-rectangle")
             .setOrigin(0.5)
             .setScrollFactor(0)
             .setDepth(1000)
@@ -96,7 +94,11 @@ export class SceneManager {
 
         // 钱包背景图片 (右侧)
         const walletBg = this.scene.add
-            .image(this.scene.cameras.main.width - 120, 48, 'profile-rectangle')
+            .image(
+                this.scene.cameras.main.width * 0.92,
+                48,
+                "profile-rectangle"
+            )
             .setOrigin(0.5)
             .setScrollFactor(0)
             .setDepth(1000)
@@ -160,58 +162,79 @@ export class SceneManager {
 
     private createSidebar() {
         const menuItems = [
-            { text: 'CONTENT', y: 480, key: 'button_content', hoverKey: 'content-hover' },
-            { text: 'WRITE', y: 420, key: 'button_write', hoverKey: 'write-hover' },
-            { text: 'CHAT', y: 360, key: 'button_chat', hoverKey: 'chat-hover' }
+            {
+                text: "CONTENT",
+                y: this.scene.cameras.main.height * 0.49,
+                key: "button_content",
+                hoverKey: "content-hover",
+            },
+            {
+                text: "WRITE",
+                y: this.scene.cameras.main.height * 0.56,
+                key: "button_write",
+                hoverKey: "write-hover",
+            },
+            {
+                text: "CHAT",
+                y: this.scene.cameras.main.height * 0.63,
+                key: "button_chat",
+                hoverKey: "chat-hover",
+            },
         ];
 
         // Add menu background rectangle
-        const menuBg = this.scene.add.image(78, 420, 'menu-rectangle')
+        const menuBg = this.scene.add
+            .image(78, 410, "menu-rectangle")
             .setScrollFactor(0)
             .setDepth(999);
 
-        menuItems.forEach(item => {
+        menuItems.forEach((item) => {
             // Create button container
             const button = this.scene.add.container(78, item.y);
 
             // Create hover elements (initially invisible)
-            const hoverEllipse = this.scene.add.image(0, 0, 'ellipse').setVisible(false);
-            const hoverText = this.scene.add.image(80, 0, item.hoverKey).setVisible(false);
+            const hoverEllipse = this.scene.add
+                .image(0, 0, "ellipse")
+                .setVisible(false);
+            const hoverText = this.scene.add
+                .image(80, 0, item.hoverKey)
+                .setVisible(false);
 
             // Create the main button
-            const mainButton = this.scene.add.image(0, 0, item.key)
+            const mainButton = this.scene.add
+                .image(0, 0, item.key)
                 .setScrollFactor(0)
                 .setDepth(1000)
                 .setInteractive({ useHandCursor: true });
 
             // Add hover effects
-            mainButton.on('pointerover', () => {
+            mainButton.on("pointerover", () => {
                 this.scene.input.manager.canvas.style.cursor = "pointer";
                 hoverEllipse.setVisible(true);
                 hoverText.setVisible(true);
-                if (item.text !== 'WRITE') {
+                if (item.text !== "WRITE") {
                     mainButton.setAlpha(0.8);
                 }
             });
 
-            mainButton.on('pointerout', () => {
+            mainButton.on("pointerout", () => {
                 this.scene.input.manager.canvas.style.cursor = "default";
                 hoverEllipse.setVisible(false);
                 hoverText.setVisible(false);
-                if (item.text !== 'WRITE') {
+                if (item.text !== "WRITE") {
                     mainButton.setAlpha(1);
                 }
             });
 
-            mainButton.on('pointerdown', () => {
-                if (item.text === 'CONTENT') {
-                    EventBus.emit('open-content');
+            mainButton.on("pointerdown", () => {
+                if (item.text === "CONTENT") {
+                    EventBus.emit("open-content");
                     this.disableGameInput();
-                } else if (item.text === 'WRITE') {
-                    EventBus.emit('open-write');
+                } else if (item.text === "WRITE") {
+                    EventBus.emit("open-write");
                     this.disableGameInput();
-                } else if (item.text === 'CHAT') {
-                    EventBus.emit('open-chat');
+                } else if (item.text === "CHAT") {
+                    EventBus.emit("open-chat");
                     this.disableGameInput();
                 }
             });
@@ -245,12 +268,15 @@ export class SceneManager {
                 obstacle.startx,
                 obstacle.starty,
                 obstacle.endx - obstacle.startx,
-                obstacle.endy - obstacle.starty,
+                obstacle.endy - obstacle.starty
             );
             this.scene.physics.add.existing(obstacleRect, true);
             this.obstrucleGroup.add(obstacleRect);
         }
-        this.scene.physics.add.collider(this.player.sprite, this.obstrucleGroup)
+        this.scene.physics.add.collider(
+            this.player.sprite,
+            this.obstrucleGroup
+        );
         //this.drawGrid();
     }
 
