@@ -154,7 +154,7 @@ export class loginScene extends Scene {
         const purpleOverlay = this.add
             .image(width / 2, height / 2, "purple")
             .setAlpha(0.7);
-
+        purpleOverlay.setScale(width / purpleOverlay.width, height / purpleOverlay.height);
         // 添加黑色蒙版
         const overlay = this.add.graphics();
         overlay.fillStyle(0x000000, 0.02);
