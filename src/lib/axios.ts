@@ -4,7 +4,7 @@ import Cookies from 'cookies-ts';
 const cookies = new Cookies(); // 创建 cookies 实例
 
 export const axiosInstance = axios.create({
-  baseURL: 'https://reach-herb-fossil-referred.trycloudflare.com/api',
+  baseURL: 'https://watt-extends-serve-ci.trycloudflare.com/api',
   timeout: 1500,
   headers: {
     'Content-Type': 'application/json',
