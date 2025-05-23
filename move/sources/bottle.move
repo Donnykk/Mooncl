@@ -23,8 +23,8 @@ public struct BottleEvent has store, copy, drop{
 }
 
 // functions
-public fun send_bottle(ctx: &mut TxContext, content: String, clock: &Clock, pool: &mut Pool,
-ticket: Coin<SUI>){
+public entry fun send_bottle(content: String, clock: &Clock, pool: &mut Pool,
+ticket: Coin<SUI>, ctx: &mut TxContext){
   pool::into_pool(pool, ticket, clock);
   let epoch = pool::get_cur_epoch(pool);
   let bottle = Bottle{

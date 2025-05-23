@@ -74,14 +74,13 @@ public fun set_claim(_: &PoolCap, pool: &mut Pool, scores: vector<u64>, addrs: v
   };
 }
 
-public fun out_pool(pool: &mut Pool, clock: &Clock, ctx: &mut TxContext): Coin<SUI>{
+public entry fun out_pool(pool: &mut Pool, ctx: &mut TxContext){
   let is_table = &mut pool.is_claim;
   let claim_table = &pool.claim;
   let key = ClaimKey{
     addr: ctx.sender(),
     epoch: pool.cur_epoch
   };
-  assert!(clock.timestamp_ms() >= pool.deadline, 0);
   assert!(!table::contains(is_table, key), 1);
   let value = table::borrow(claim_table, key);
   let coin = coin::take(&mut pool.balance, *value, ctx);
@@ -90,7 +89,7 @@ public fun out_pool(pool: &mut Pool, clock: &Clock, ctx: &mut TxContext): Coin<S
     epoch: pool.cur_epoch
   };
   table::add(is_table, key, true);
-  coin
+  transfer::public_transfer(coin, ctx.sender());
 }
 
 // read only functions
