@@ -26,6 +26,10 @@
         "build": "node log.js build & next build",
         "dev-nolog": "next dev -p 8000",
         "build-nolog": "next build",
+<<<<<<< HEAD
+=======
+        "start": "next start -p 8000"
+>>>>>>> 95ceb87fd9359eca7c4f768d209d1e6a723b709a
     },
     "dependencies": {
         "@mysten/dapp-kit": "^0.16.3",
