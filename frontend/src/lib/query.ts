@@ -46,3 +46,24 @@ export const queryPool = graphql(`
       }
     }
 `);
+
+export const queryField = graphql(`
+  query GetDynamicField($address: String!, $type: String!, $bcs: Base64!) {
+     object(address: $address) {
+       dynamicField(
+         name: { type: $type, bcs: $bcs }
+       ) {
+         value {
+           ... on MoveValue {
+             data
+           }
+           ... on MoveObject {
+             contents {
+               data
+             }
+           }
+         }
+       }
+     }
+   }
+ `)

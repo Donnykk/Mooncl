@@ -3,7 +3,12 @@ import { MapSchema, Schema, type } from "@colyseus/schema";
 import { StoryService } from "../services/storyServices";
 import { UserService } from "../services/userService";
 import { ReplyService } from "../services/replyService";
-import { generateJWT, verifyAptosSignature, verifyJWT, verifySuiSignature } from "../utils/jwtUtils";
+import {
+  generateJWT,
+  verifysuiSignature,
+  verifyJWT,
+  verifySuiSignature,
+} from "../utils/jwtUtils";
 import { getStoryById } from "../database/storyDB";
 import crypto from "crypto";
 
@@ -36,15 +41,24 @@ export class TavernRoom extends Room<TavernState> {
     this.onMessage("fetchStory", this.handleFetchStories.bind(this));
     this.onMessage("sendWhiskey", this.handleSendWhiskey.bind(this));
     this.onMessage("getWhiskeyPoints", this.handleGetWhiskeyPoints.bind(this));
-    this.onMessage("updateWhiskeyPoints", this.handleUpdateWhiskeyPoints.bind(this));
+    this.onMessage(
+      "updateWhiskeyPoints",
+      this.handleUpdateWhiskeyPoints.bind(this)
+    );
     this.onMessage("getIntimacy", this.handleGetIntimacy.bind(this));
     this.onMessage("updateIntimacy", this.handleUpdateIntimacy.bind(this));
     this.onMessage("replyStory", this.handleReplyStory.bind(this));
     this.onMessage("replyUser", this.handleReply.bind(this));
-    this.onMessage("getRepliesByStoryId", this.handleGetRepliesByStoryId.bind(this));
+    this.onMessage(
+      "getRepliesByStoryId",
+      this.handleGetRepliesByStoryId.bind(this)
+    );
     this.onMessage("getNewReply", this.handleGetNewReply.bind(this));
     this.onMessage("markRepliesRead", this.handleMarkRepliesRead.bind(this));
-    this.onMessage("markRepliesUnread", this.handleMarkRepliesUnread.bind(this));
+    this.onMessage(
+      "markRepliesUnread",
+      this.handleMarkRepliesUnread.bind(this)
+    );
     this.onMessage("getRecvStories", this.handleGetRecvStories.bind(this));
     this.onMessage("markLikedStory", this.handleMarkLikedStory.bind(this));
   }
@@ -62,13 +76,13 @@ export class TavernRoom extends Room<TavernState> {
   }
 
   /**
-     * 验证 JWT 并返回用户地址
-     * @param token - JWT 字符串
-     * @returns 用户地址或 null
-     */
+   * 验证 JWT 并返回用户地址
+   * @param token - JWT 字符串
+   * @returns 用户地址或 null
+   */
   private verifyClientJWT(token: string): string | null {
     const decoded = verifyJWT(token);
-    if (decoded && 'address' in decoded) {
+    if (decoded && "address" in decoded) {
       return (decoded as any).address;
     }
     return null;
@@ -102,7 +116,10 @@ export class TavernRoom extends Room<TavernState> {
   async handleJWTLogin(client: Client, data: any) {
     const { token } = data;
     if (!token) {
-      client.send("loginResponse", { success: false, reason: "Token is required." });
+      client.send("loginResponse", {
+        success: false,
+        reason: "Token is required.",
+      });
       return;
     }
 
@@ -110,7 +127,10 @@ export class TavernRoom extends Room<TavernState> {
       // 验证 JWT
       const address = this.verifyClientJWT(token);
       if (!address) {
-        client.send("loginResponse", { success: false, reason: "Invalid token." });
+        client.send("loginResponse", {
+          success: false,
+          reason: "Invalid token.",
+        });
         return;
       }
 
@@ -131,10 +151,12 @@ export class TavernRoom extends Room<TavernState> {
         success: true,
         token,
         user,
-        userState
+        userState,
       });
 
-      console.log(`Player ${address} logged in with JWT, session ${client.sessionId}`);
+      console.log(
+        `Player ${address} logged in with JWT, session ${client.sessionId}`
+      );
     } catch (error: any) {
       client.send("loginResponse", { success: false, reason: error.message });
     }
@@ -146,24 +168,27 @@ export class TavernRoom extends Room<TavernState> {
   async handleLogin(client: Client, data: any) {
     const { address } = data;
     if (!address) {
-      client.send("loginResponse", { success: false, reason: "Address is required." });
+      client.send("loginResponse", {
+        success: false,
+        reason: "Address is required.",
+      });
       return;
     }
 
     // 转换地址格式
     let addressStr: string;
-    const aptosAddress = this.convertAptosAddress(address);
-    if (aptosAddress) {
-      console.log("Aptos address detected.");
-      console.log("Hex Address:", aptosAddress);
-      addressStr = aptosAddress;
+    const suiAddress = this.convertsuiAddress(address);
+    if (suiAddress) {
+      console.log("sui address detected.");
+      console.log("Hex Address:", suiAddress);
+      addressStr = suiAddress;
     } else {
       console.log("Sui address detected.");
       addressStr = address;
     }
 
     // 生成一个随机的挑战消息
-    const challenge = Buffer.from(crypto.randomBytes(32)).toString('hex');
+    const challenge = Buffer.from(crypto.randomBytes(32)).toString("hex");
 
     // 存储挑战消息，关联到客户端的 sessionId
     this.state.loginChallenges.set(client.sessionId, challenge);
@@ -172,38 +197,51 @@ export class TavernRoom extends Room<TavernState> {
     const player = new Player();
     player.address = addressStr;
     this.state.players.set(client.sessionId, player);
-    console.log(`Player ${player.address} logged in with session ${client.sessionId}, address ${addressStr} and challenge ${challenge}`);
+    console.log(
+      `Player ${player.address} logged in with session ${client.sessionId}, address ${addressStr} and challenge ${challenge}`
+    );
 
     // 发送挑战消息给前端
     client.send("loginChallenge", { challenge });
   }
 
   /**
-   * 验证 Aptos 地址并转换为字符串格式
+   * 验证 sui 地址并转换为字符串格式
    */
-  private convertAptosAddress(address: any): string | null {
+  private convertsuiAddress(address: any): string | null {
     if (address?.data && typeof address.data === "object") {
       const values = Object.values(address.data);
-      if (values.length === 32 && values.every((v) => typeof v === "number" && v >= 0 && v <= 255)) {
+      if (
+        values.length === 32 &&
+        values.every((v) => typeof v === "number" && v >= 0 && v <= 255)
+      ) {
         // 转换为标准的 hex 字符串格式
-        return "0x" + Buffer.from(new Uint8Array(values as number[])).toString("hex");
+        return (
+          "0x" + Buffer.from(new Uint8Array(values as number[])).toString("hex")
+        );
       }
     }
     return null;
   }
 
   /**
-    * 处理用户签名验证请求，生成 JWT
-    */
+   * 处理用户签名验证请求，生成 JWT
+   */
   async handleLoginSignature(client: Client, data: any) {
     const { address, signature, challenge } = data;
     if (!challenge) {
-      client.send("loginResponse", { success: false, reason: "No challenge found. Please initiate login again." });
+      client.send("loginResponse", {
+        success: false,
+        reason: "No challenge found. Please initiate login again.",
+      });
       return;
     }
     // 获取用户地址
     if (!address) {
-      client.send("loginResponse", { success: false, reason: "User not authenticated." });
+      client.send("loginResponse", {
+        success: false,
+        reason: "User not authenticated.",
+      });
       return;
     }
 
@@ -216,13 +254,13 @@ export class TavernRoom extends Room<TavernState> {
       let addressStr: string;
       let isValid: boolean;
 
-      // 检查是否为 Aptos 地址并转换
-      const aptosAddress = this.convertAptosAddress(address);
-      if (aptosAddress) {
-        console.log("Aptos signature detected.");
-        console.log("Hex Address:", aptosAddress);
-        isValid = await verifyAptosSignature(aptosAddress, challenge, signature);
-        addressStr = aptosAddress;
+      // 检查是否为 sui 地址并转换
+      const suiAddress = this.convertsuiAddress(address);
+      if (suiAddress) {
+        console.log("sui signature detected.");
+        console.log("Hex Address:", suiAddress);
+        isValid = await verifysuiSignature(suiAddress, challenge, signature);
+        addressStr = suiAddress;
       } else {
         console.log("Sui signature detected.");
         isValid = await verifySuiSignature(address, challenge, signature);
@@ -230,7 +268,7 @@ export class TavernRoom extends Room<TavernState> {
       }
 
       // 读取用户信息
-      console.log("address:", addressStr)
+      console.log("address:", addressStr);
       const user = await UserService.getUser(addressStr);
       const userState = await UserService.getDailyState(addressStr);
       // 签名验证通过，生成 JWT
@@ -249,18 +287,25 @@ export class TavernRoom extends Room<TavernState> {
    * 处理发布故事请求
    */
   async handlePublishStory(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     const { title, storyText } = data;
     console.log("title:", title);
     console.log("storyText:", storyText);
 
     try {
-      const story = await StoryService.publishUserStory(address, title, storyText);
+      const story = await StoryService.publishUserStory(
+        address,
+        title,
+        storyText
+      );
       client.send("storyPublishedResponse", { success: true, story });
     } catch (error: any) {
-      client.send("storyPublishedResponse", { success: false, reason: error.message });
+      client.send("storyPublishedResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -268,15 +313,18 @@ export class TavernRoom extends Room<TavernState> {
    * 处理删除故事请求
    */
   async handleDeleteStory(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     const { storyId } = data;
     try {
       await StoryService.deleteStory(address, storyId);
       client.send("deleteStoryResponse", { success: true });
     } catch (error: any) {
-      client.send("deleteStoryResponse", { success: false, reason: error.message });
+      client.send("deleteStoryResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -284,15 +332,17 @@ export class TavernRoom extends Room<TavernState> {
    * 处理获取故事列表请求
    */
   async handleGetAllStory(client: Client) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     try {
       const stories = await StoryService.getAllStory(address);
       client.send("getAllStoryResponse", { success: true, stories });
-    }
-    catch (error: any) {
-      client.send("getAllStoryResponse", { success: false, reason: error.message });
+    } catch (error: any) {
+      client.send("getAllStoryResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -300,14 +350,17 @@ export class TavernRoom extends Room<TavernState> {
    * 处理领取故事请求
    */
   async handleFetchStories(client: Client) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     try {
       const story = await StoryService.fetchRandomStory(address);
       client.send("fetchStoriesResult", { success: true, story });
     } catch (error: any) {
-      client.send("fetchStoriesResult", { success: false, reason: error.message });
+      client.send("fetchStoriesResult", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -315,8 +368,8 @@ export class TavernRoom extends Room<TavernState> {
    * 处理赠送威士忌请求
    */
   async handleSendWhiskey(client: Client, data: any) {
-    const fromAddress = this.authenticate(client);  // 调用认证函数
-    if (!fromAddress) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const fromAddress = this.authenticate(client); // 调用认证函数
+    if (!fromAddress) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
     const { storyId } = data;
     try {
       await StoryService.sendWhiskey(fromAddress, storyId);
@@ -330,14 +383,17 @@ export class TavernRoom extends Room<TavernState> {
    * 处理读取积分请求
    */
   async handleGetWhiskeyPoints(client: Client) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     try {
       const points = UserService.getWhiskeyPoints(address);
       client.send("getWhiskeyPointsResponse", { success: true, points });
     } catch (error: any) {
-      client.send("getWhiskeyPointsResponse", { success: false, reason: error.message });
+      client.send("getWhiskeyPointsResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -345,14 +401,17 @@ export class TavernRoom extends Room<TavernState> {
    * 处理更新积分请求
    */
   async handleUpdateWhiskeyPoints(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
+    const address = this.authenticate(client); // 调用认证函数
     if (!address) return;
     const { newPoints } = data;
     try {
       await UserService.updateWhiskeyPoints(address, newPoints);
       client.send("updateWhiskeyPointsResponse", { success: true, newPoints });
     } catch (error: any) {
-      client.send("updateWhiskeyPointsResponse", { success: false, reason: error.message });
+      client.send("updateWhiskeyPointsResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -360,14 +419,17 @@ export class TavernRoom extends Room<TavernState> {
    * 处理读取亲密度请求
    */
   async handleGetIntimacy(client: Client) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     try {
       const points = UserService.getIntimacy(address);
       client.send("getIntimacyResponse", { success: true, points });
     } catch (error: any) {
-      client.send("getIntimacyResponse", { success: false, reason: error.message });
+      client.send("getIntimacyResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -375,14 +437,17 @@ export class TavernRoom extends Room<TavernState> {
    * 处理更新亲密度请求
    */
   async handleUpdateIntimacy(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
+    const address = this.authenticate(client); // 调用认证函数
     if (!address) return;
     const { newIntimacy } = data;
     try {
       await UserService.updateIntimacy(address, newIntimacy);
       client.send("updateIntimacyResponse", { success: true, newIntimacy });
     } catch (error: any) {
-      client.send("updateIntimacyResponse", { success: false, reason: error.message });
+      client.send("updateIntimacyResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -390,8 +455,8 @@ export class TavernRoom extends Room<TavernState> {
    * 处理回复故事请求
    */
   async handleReplyStory(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     const { storyId, replyText } = data;
     console.log(storyId);
@@ -401,7 +466,10 @@ export class TavernRoom extends Room<TavernState> {
       const reply = await ReplyService.replyStory(address, storyId, replyText);
       client.send("replyStoryResponse", { success: true, reply });
     } catch (error: any) {
-      client.send("replyStoryResponse", { success: false, reason: error.message });
+      client.send("replyStoryResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -409,34 +477,48 @@ export class TavernRoom extends Room<TavernState> {
    * 处理回复用户请求
    */
   async handleReply(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     const { targetUserAddress, replyText, storyId } = data;
 
     try {
-      const reply = await ReplyService.replyBack(address, storyId, replyText, targetUserAddress);
+      const reply = await ReplyService.replyBack(
+        address,
+        storyId,
+        replyText,
+        targetUserAddress
+      );
       client.send("replyUserResponse", { success: true, reply });
     } catch (error: any) {
-      client.send("replyUserResponse", { success: false, reason: error.message });
+      client.send("replyUserResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
   /**
    * 根据StoryId获取聊天历史
-   * @param client 
-   * @param storyId 
+   * @param client
+   * @param storyId
    */
   async handleGetRepliesByStoryId(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
     const { storyId } = data;
     try {
       console.log("storyId: ", storyId);
-      const replies = await ReplyService.getRepliesForStoryByUser(address, Number(storyId));
-      client.send("getRepliesResponse", { success: true, replies })
+      const replies = await ReplyService.getRepliesForStoryByUser(
+        address,
+        Number(storyId)
+      );
+      client.send("getRepliesResponse", { success: true, replies });
     } catch (error: any) {
-      client.send("getRepliesResponse", { success: false, reason: error.message });
+      client.send("getRepliesResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -444,14 +526,17 @@ export class TavernRoom extends Room<TavernState> {
    * 获取新的回复
    */
   async handleGetNewReply(client: Client) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     try {
       const newReplies = await ReplyService.getNewReply(address);
       client.send("newRepliesResponse", { success: true, newReplies });
     } catch (error: any) {
-      client.send("newRepliesResponse", { success: false, reason: error.message });
+      client.send("newRepliesResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -459,8 +544,8 @@ export class TavernRoom extends Room<TavernState> {
    * 标记回复为已读
    */
   async handleMarkRepliesRead(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     const { replyIds } = data;
 
@@ -468,7 +553,10 @@ export class TavernRoom extends Room<TavernState> {
       await ReplyService.markReplyRead(replyIds);
       client.send("markRepliesReadResponse", { success: true });
     } catch (error: any) {
-      client.send("markRepliesReadResponse", { success: false, reason: error.message });
+      client.send("markRepliesReadResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -476,8 +564,8 @@ export class TavernRoom extends Room<TavernState> {
    * 标记回复为未读
    */
   async handleMarkRepliesUnread(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
-    if (!address) return;  // 如果认证失败，函数会返回 null 并已经向客户端发送错误
+    const address = this.authenticate(client); // 调用认证函数
+    if (!address) return; // 如果认证失败，函数会返回 null 并已经向客户端发送错误
 
     const { replyIds } = data;
 
@@ -485,16 +573,18 @@ export class TavernRoom extends Room<TavernState> {
       await ReplyService.markReplyUnread(replyIds);
       client.send("markRepliesUnreadResponse", { success: true });
     } catch (error: any) {
-      client.send("markRepliesUnreadResponse", { success: false, reason: error.message });
+      client.send("markRepliesUnreadResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
-
 
   /***
    * 获取收到故事列表
    */
   async handleGetRecvStories(client: Client) {
-    const address = this.authenticate(client);  // 调用认证函数
+    const address = this.authenticate(client); // 调用认证函数
     if (!address) return;
     try {
       await StoryService.getDailyStories(address);
@@ -506,7 +596,10 @@ export class TavernRoom extends Room<TavernState> {
       );
       client.send("getRecvStoriesResponse", { success: true, recvStories });
     } catch (error: any) {
-      client.send("getRecvStoriesResponse", { success: false, reason: error.message });
+      client.send("getRecvStoriesResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 
@@ -514,14 +607,17 @@ export class TavernRoom extends Room<TavernState> {
    * 处理收藏请求
    */
   async handleMarkLikedStory(client: Client, data: any) {
-    const address = this.authenticate(client);  // 调用认证函数
+    const address = this.authenticate(client); // 调用认证函数
     if (!address) return;
     const { storyId } = data;
     try {
       await StoryService.markLikedStory(address, storyId);
       client.send("markLikedStoryResponse", { success: true });
     } catch (error: any) {
-      client.send("markLikedStoryResponse", { success: false, reason: error.message });
+      client.send("markLikedStoryResponse", {
+        success: false,
+        reason: error.message,
+      });
     }
   }
 }
