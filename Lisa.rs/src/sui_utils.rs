@@ -1,12 +1,12 @@
-use aptos_sdk::rest_client::{Client as aptos_client, Transaction as RestTransaction, Transaction};
-use aptos_sdk::crypto::HashValue;
+use sui_sdk::rest_client::{Client as sui_client, Transaction as RestTransaction, Transaction};
+use sui_sdk::crypto::HashValue;
 use url::Url;
 use std::str::FromStr;
 
 pub async fn verify_tx(tx_hash_str: &str) -> Result<bool, anyhow::Error> {
-    // test aptos zone
-    let base_url = Url::parse("https://fullnode.testnet.aptoslabs.com").expect("Invalid URL");
-    let client = aptos_client::new(base_url);
+    // test sui zone
+    let base_url = Url::parse("https://fullnode.testnet.sui.io").expect("Invalid URL");
+    let client = sui_client::new(base_url);
     let txn_hash_str_proc = tx_hash_str.trim_start_matches("0x");
 
     let tx_hash = match HashValue::from_str(txn_hash_str_proc) {

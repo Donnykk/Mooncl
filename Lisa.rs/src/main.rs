@@ -9,11 +9,11 @@ pub mod db_schemas;
 pub mod agent_impl;
 pub mod request_model;
 pub mod test_sqlite_vec;
-pub mod aptos_utils;
+pub mod sui_utils;
 
 use request_model::{ChatRequest, GeneralReponse, RetriveRequest, RetriveResponse, GradeBottleRequest, GradeBottleResponse};
 use agent_impl::{RetrivalAgent, prompt_hub, RetrivalTool};
-use aptos_utils::verify_tx;
+use sui_utils::verify_tx;
 
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Error};
 use actix_web::middleware::Logger;
